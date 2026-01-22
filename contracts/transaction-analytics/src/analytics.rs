@@ -10,6 +10,17 @@ use soroban_sdk::{Address, Env, Map, Symbol, Vec};
 
 use crate::types::{BatchMetrics, CategoryMetrics, Transaction, MAX_BATCH_SIZE};
 
+/// Calculates the processing fee for a transaction amount.
+///
+/// Current fee model: 0.1% (10 basis points)
+pub fn calculate_fee(amount: i128) -> i128 {
+    if amount <= 0 {
+        return 0;
+    }
+    // 0.1% = amount * 10 / 10000 = amount / 1000
+    amount / 1000
+}
+
 /// Computes aggregated metrics for a batch of transactions.
 ///
 /// Optimized to perform a single pass over the transaction data,
@@ -30,12 +41,14 @@ pub fn compute_batch_metrics(
             max_amount: 0,
             unique_senders: 0,
             unique_recipients: 0,
+            total_fees: 0,
             processed_at,
         };
     }
 
     // Accumulate metrics in a single pass (optimization: avoid multiple iterations)
     let mut total_volume: i128 = 0;
+    let mut total_fees: i128 = 0;
     let mut min_amount: i128 = i128::MAX;
     let mut max_amount: i128 = i128::MIN;
 
@@ -46,6 +59,10 @@ pub fn compute_batch_metrics(
     for tx in transactions.iter() {
         // Accumulate volume
         total_volume = total_volume.checked_add(tx.amount).unwrap_or(i128::MAX);
+        
+        // Calculate and accumulate fees
+        let fee = calculate_fee(tx.amount);
+        total_fees = total_fees.checked_add(fee).unwrap_or(i128::MAX);
 
         // Track min/max
         if tx.amount < min_amount {
@@ -75,6 +92,7 @@ pub fn compute_batch_metrics(
         max_amount,
         unique_senders: senders.len(),
         unique_recipients: recipients.len(),
+        total_fees,
         processed_at,
     }
 }
@@ -87,21 +105,27 @@ pub fn compute_category_metrics(
     transactions: &Vec<Transaction>,
     total_volume: i128,
 ) -> Vec<CategoryMetrics> {
-    let mut category_map: Map<Symbol, (u32, i128)> = Map::new(env);
+    // Map stores (tx_count, total_volume, total_fees)
+    let mut category_map: Map<Symbol, (u32, i128, i128)> = Map::new(env);
 
     // Single pass to aggregate by category
     for tx in transactions.iter() {
-        let current = category_map.get(tx.category.clone()).unwrap_or((0, 0));
+        let current = category_map.get(tx.category.clone()).unwrap_or((0, 0, 0));
+        let fee = calculate_fee(tx.amount);
         category_map.set(
             tx.category.clone(),
-            (current.0 + 1, current.1.checked_add(tx.amount).unwrap_or(i128::MAX)),
+            (
+                current.0 + 1, 
+                current.1.checked_add(tx.amount).unwrap_or(i128::MAX),
+                current.2.checked_add(fee).unwrap_or(i128::MAX),
+            ),
         );
     }
 
     // Convert to CategoryMetrics vector
     let mut result: Vec<CategoryMetrics> = Vec::new(env);
 
-    for (category, (tx_count, volume)) in category_map.iter() {
+    for (category, (tx_count, volume, fees)) in category_map.iter() {
         // Calculate percentage in basis points (10000 = 100%)
         let volume_percentage_bps = if total_volume > 0 {
             ((volume * 10000) / total_volume) as u32
@@ -113,6 +137,7 @@ pub fn compute_category_metrics(
             category,
             tx_count,
             total_volume: volume,
+            total_fees: fees,
             volume_percentage_bps,
         });
     }
