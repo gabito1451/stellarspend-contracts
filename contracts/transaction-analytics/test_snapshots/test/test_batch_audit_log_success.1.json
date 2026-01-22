@@ -1,6 +1,6 @@
 {
   "generators": {
-    "address": 6,
+    "address": 3,
     "nonce": 0
   },
   "auth": [
@@ -13,7 +13,7 @@
           "function": {
             "contract_fn": {
               "contract_address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD2KM",
-              "function_name": "process_batch",
+              "function_name": "batch_audit_log",
               "args": [
                 {
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
@@ -24,26 +24,7 @@
                       "map": [
                         {
                           "key": {
-                            "symbol": "amount"
-                          },
-                          "val": {
-                            "i128": {
-                              "hi": 0,
-                              "lo": 500
-                            }
-                          }
-                        },
-                        {
-                          "key": {
-                            "symbol": "category"
-                          },
-                          "val": {
-                            "symbol": "transfer"
-                          }
-                        },
-                        {
-                          "key": {
-                            "symbol": "from"
+                            "symbol": "actor"
                           },
                           "val": {
                             "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
@@ -51,26 +32,26 @@
                         },
                         {
                           "key": {
+                            "symbol": "operation"
+                          },
+                          "val": {
+                            "symbol": "login"
+                          }
+                        },
+                        {
+                          "key": {
+                            "symbol": "status"
+                          },
+                          "val": {
+                            "symbol": "success"
+                          }
+                        },
+                        {
+                          "key": {
                             "symbol": "timestamp"
                           },
                           "val": {
-                            "u64": 0
-                          }
-                        },
-                        {
-                          "key": {
-                            "symbol": "to"
-                          },
-                          "val": {
-                            "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
-                          }
-                        },
-                        {
-                          "key": {
-                            "symbol": "tx_id"
-                          },
-                          "val": {
-                            "u64": 1
+                            "u64": 1000
                           }
                         }
                       ]
@@ -79,29 +60,26 @@
                       "map": [
                         {
                           "key": {
-                            "symbol": "amount"
+                            "symbol": "actor"
                           },
                           "val": {
-                            "i128": {
-                              "hi": 0,
-                              "lo": 500
-                            }
+                            "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
                           }
                         },
                         {
                           "key": {
-                            "symbol": "category"
+                            "symbol": "operation"
                           },
                           "val": {
-                            "symbol": "transfer"
+                            "symbol": "update_profile"
                           }
                         },
                         {
                           "key": {
-                            "symbol": "from"
+                            "symbol": "status"
                           },
                           "val": {
-                            "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAK3IM"
+                            "symbol": "success"
                           }
                         },
                         {
@@ -109,30 +87,13 @@
                             "symbol": "timestamp"
                           },
                           "val": {
-                            "u64": 0
-                          }
-                        },
-                        {
-                          "key": {
-                            "symbol": "to"
-                          },
-                          "val": {
-                            "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMDR4"
-                          }
-                        },
-                        {
-                          "key": {
-                            "symbol": "tx_id"
-                          },
-                          "val": {
-                            "u64": 2
+                            "u64": 1005
                           }
                         }
                       ]
                     }
                   ]
-                },
-                "void"
+                }
               ]
             }
           },
@@ -140,6 +101,8 @@
         }
       ]
     ],
+    [],
+    [],
     []
   ],
   "ledger": {
@@ -159,7 +122,7 @@
             "key": {
               "vec": [
                 {
-                  "symbol": "BatchMetrics"
+                  "symbol": "AuditLog"
                 },
                 {
                   "u64": 1
@@ -179,7 +142,7 @@
                 "key": {
                   "vec": [
                     {
-                      "symbol": "BatchMetrics"
+                      "symbol": "AuditLog"
                     },
                     {
                       "u64": 1
@@ -191,78 +154,112 @@
                   "map": [
                     {
                       "key": {
-                        "symbol": "avg_amount"
+                        "symbol": "actor"
                       },
                       "val": {
-                        "i128": {
-                          "hi": 0,
-                          "lo": 500
-                        }
+                        "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
                       }
                     },
                     {
                       "key": {
-                        "symbol": "max_amount"
+                        "symbol": "operation"
                       },
                       "val": {
-                        "i128": {
-                          "hi": 0,
-                          "lo": 500
-                        }
+                        "symbol": "login"
                       }
                     },
                     {
                       "key": {
-                        "symbol": "min_amount"
+                        "symbol": "status"
                       },
                       "val": {
-                        "i128": {
-                          "hi": 0,
-                          "lo": 500
-                        }
+                        "symbol": "success"
                       }
                     },
                     {
                       "key": {
-                        "symbol": "processed_at"
+                        "symbol": "timestamp"
                       },
                       "val": {
-                        "u64": 0
+                        "u64": 1000
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "ext": "v0"
+          },
+          4095
+        ]
+      ],
+      [
+        {
+          "contract_data": {
+            "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD2KM",
+            "key": {
+              "vec": [
+                {
+                  "symbol": "AuditLog"
+                },
+                {
+                  "u64": 2
+                }
+              ]
+            },
+            "durability": "persistent"
+          }
+        },
+        [
+          {
+            "last_modified_ledger_seq": 0,
+            "data": {
+              "contract_data": {
+                "ext": "v0",
+                "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD2KM",
+                "key": {
+                  "vec": [
+                    {
+                      "symbol": "AuditLog"
+                    },
+                    {
+                      "u64": 2
+                    }
+                  ]
+                },
+                "durability": "persistent",
+                "val": {
+                  "map": [
+                    {
+                      "key": {
+                        "symbol": "actor"
+                      },
+                      "val": {
+                        "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
                       }
                     },
                     {
                       "key": {
-                        "symbol": "total_volume"
+                        "symbol": "operation"
                       },
                       "val": {
-                        "i128": {
-                          "hi": 0,
-                          "lo": 1000
-                        }
+                        "symbol": "update_profile"
                       }
                     },
                     {
                       "key": {
-                        "symbol": "tx_count"
+                        "symbol": "status"
                       },
                       "val": {
-                        "u32": 2
+                        "symbol": "success"
                       }
                     },
                     {
                       "key": {
-                        "symbol": "unique_recipients"
+                        "symbol": "timestamp"
                       },
                       "val": {
-                        "u32": 2
-                      }
-                    },
-                    {
-                      "key": {
-                        "symbol": "unique_senders"
-                      },
-                      "val": {
-                        "u32": 2
+                        "u64": 1005
                       }
                     }
                   ]
@@ -318,7 +315,7 @@
                           ]
                         },
                         "val": {
-                          "u64": 1
+                          "u64": 0
                         }
                       },
                       {
@@ -330,7 +327,7 @@
                           ]
                         },
                         "val": {
-                          "u64": 0
+                          "u64": 2
                         }
                       },
                       {
@@ -342,7 +339,7 @@
                           ]
                         },
                         "val": {
-                          "u64": 2
+                          "u64": 0
                         }
                       }
                     ]

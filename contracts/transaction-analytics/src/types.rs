@@ -23,6 +23,20 @@ pub struct Transaction {
     pub category: Symbol,
 }
 
+/// Represents a single audit log entry.
+#[derive(Clone, Debug)]
+#[contracttype]
+pub struct AuditLog {
+    /// Address of the actor who performed the operation
+    pub actor: Address,
+    /// The operation performed (e.g., "init", "config_update")
+    pub operation: Symbol,
+    /// Timestamp of the operation
+    pub timestamp: u64,
+    /// Status of the operation (e.g., "success", "failure")
+    pub status: Symbol,
+}
+
 /// Aggregated metrics for a batch of transactions.
 #[derive(Clone, Debug, Default)]
 #[contracttype]
@@ -71,6 +85,10 @@ pub enum DataKey {
     BatchMetrics(u64),
     /// Total transactions processed lifetime
     TotalTxProcessed,
+    /// Stored audit log for a specific index
+    AuditLog(u64),
+    /// Total number of audit logs stored
+    TotalAuditLogs,
 }
 
 /// Events emitted by the analytics contract.
@@ -105,5 +123,11 @@ impl AnalyticsEvents {
     pub fn high_value_alert(env: &Env, batch_id: u64, tx_id: u64, amount: i128) {
         let topics = (symbol_short!("alert"), symbol_short!("highval"));
         env.events().publish(topics, (batch_id, tx_id, amount));
+    }
+
+    /// Event emitted when an audit log is created.
+    pub fn audit_logged(env: &Env, actor: &Address, operation: &Symbol, status: &Symbol) {
+        let topics = (symbol_short!("audit"), symbol_short!("log"), actor);
+        env.events().publish(topics, (operation, status));
     }
 }

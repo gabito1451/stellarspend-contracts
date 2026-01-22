@@ -8,7 +8,7 @@
 
 use soroban_sdk::{Address, Env, Map, Symbol, Vec};
 
-use crate::types::{BatchMetrics, CategoryMetrics, Transaction, MAX_BATCH_SIZE};
+use crate::types::{AuditLog, BatchMetrics, CategoryMetrics, Transaction, MAX_BATCH_SIZE};
 
 /// Computes aggregated metrics for a batch of transactions.
 ///
@@ -157,6 +157,27 @@ pub fn validate_batch(transactions: &Vec<Transaction>) -> Result<(), &'static st
     for tx in transactions.iter() {
         if tx.amount < 0 {
             return Err("Transaction amount cannot be negative");
+        }
+    }
+
+    Ok(())
+}
+
+/// Validates a batch of audit logs.
+pub fn validate_audit_logs(logs: &Vec<AuditLog>) -> Result<(), &'static str> {
+    if logs.len() == 0 {
+        return Err("Audit logs batch cannot be empty");
+    }
+
+    if logs.len() > MAX_BATCH_SIZE {
+        return Err("Audit logs batch exceeds maximum size");
+    }
+
+    for log in logs.iter() {
+        // Simple check: operation cannot be empty (dummy symbol check if needed)
+        // In Soroban, Symbols are usually non-empty if they represent meaningful strings.
+        if log.timestamp == 0 {
+            return Err("Audit log timestamp cannot be zero");
         }
     }
 

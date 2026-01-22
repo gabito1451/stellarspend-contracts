@@ -2964,6 +2964,18 @@
                         "key": {
                           "vec": [
                             {
+                              "symbol": "TotalAuditLogs"
+                            }
+                          ]
+                        },
+                        "val": {
+                          "u64": 0
+                        }
+                      },
+                      {
+                        "key": {
+                          "vec": [
+                            {
                               "symbol": "TotalTxProcessed"
                             }
                           ]
