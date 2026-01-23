@@ -56,7 +56,6 @@ impl SharedBudgetContract {
     }
 
     /// Allocates a shared budget (caller balance) to multiple recipients in batch.
-    ///
     /// Performs per-recipient validation and supports partial failures. The caller
     /// must be the configured admin and the source of funds.
     pub fn allocate_shared_budget_batch(
@@ -135,7 +134,7 @@ impl SharedBudgetContract {
 
             // Simulate insufficient shared budget for very large amounts.
             // This avoids relying on real token balances while still
-            // exercising partial-failure behavior.
+            // exercising partial failure behavior.
             const MAX_SIMULATED_SHARED_BUDGET: i128 = 1_000_000_000_000; // 1e12
             if request.amount > MAX_SIMULATED_SHARED_BUDGET {
                 results.push_back(AllocationResult::Failure(
