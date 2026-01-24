@@ -41,6 +41,8 @@ pub struct BatchMetrics {
     pub unique_senders: u32,
     /// Number of unique recipients
     pub unique_recipients: u32,
+    /// Total fees collected for the batch
+    pub total_fees: i128,
     /// Batch processing timestamp
     pub processed_at: u64,
 }
@@ -55,6 +57,8 @@ pub struct CategoryMetrics {
     pub tx_count: u32,
     /// Total volume for this category
     pub total_volume: i128,
+    /// Total fees for this category
+    pub total_fees: i128,
     /// Percentage of total batch volume (basis points, 10000 = 100%)
     pub volume_percentage_bps: u32,
 }
