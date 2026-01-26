@@ -8,9 +8,8 @@
 
 use soroban_sdk::{Address, Env, Map, Symbol, Vec};
 
-use crate::types::{AuditLog, BatchMetrics, CategoryMetrics, Transaction, MAX_BATCH_SIZE};
 use crate::types::{
-    BatchMetrics, BundleResult, BundledTransaction, CategoryMetrics, Transaction,
+    AuditLog, BatchMetrics, BundleResult, BundledTransaction, CategoryMetrics, Transaction,
     ValidationResult, MAX_BATCH_SIZE,
 };
 
@@ -287,7 +286,7 @@ pub fn validate_bundle_transactions(
 ///
 /// Computes bundle metrics and determines if the bundle can be created.
 pub fn create_bundle_result(
-    env: &Env,
+    _env: &Env,
     bundle_id: u64,
     bundled_transactions: &Vec<BundledTransaction>,
     validation_results: &Vec<ValidationResult>,
