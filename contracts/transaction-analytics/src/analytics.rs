@@ -202,7 +202,7 @@ pub fn validate_audit_logs(logs: &Vec<AuditLog>) -> Result<(), &'static str> {
     }
 
     for log in logs.iter() {
-        // Simple check: operation cannot be empty (dummy symbol check if needed)
+        // Simple check: operation cannot be empty
         if log.timestamp == 0 {
             return Err("Audit log timestamp cannot be zero");
         }
