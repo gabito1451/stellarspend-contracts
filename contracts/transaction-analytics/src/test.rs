@@ -3,8 +3,8 @@
 #![cfg(test)]
 
 use crate::{
-    BundledTransaction, BundleResult, Transaction, TransactionAnalyticsContract,
-    TransactionAnalyticsContractClient, ValidationResult,
+    BundledTransaction, Transaction, TransactionAnalyticsContract,
+    TransactionAnalyticsContractClient, TransactionStatus, TransactionStatusUpdate,
 };
 use soroban_sdk::{
     testutils::{Address as _, Events},
@@ -397,6 +397,65 @@ fn test_events_emitted_on_process() {
     assert!(events.len() >= 4);
 }
 
+#[test]
+fn test_update_transaction_statuses_success_and_invalid_ids() {
+    let (env, admin, client) = setup_test_env();
+
+    let mut transactions: Vec<Transaction> = Vec::new(&env);
+    transactions.push_back(create_transaction(&env, 1, 1000, "transfer"));
+    transactions.push_back(create_transaction(&env, 2, 2000, "transfer"));
+
+    client.process_batch(&admin, &transactions, &None);
+
+    let mut updates: Vec<TransactionStatusUpdate> = Vec::new(&env);
+    updates.push_back(TransactionStatusUpdate { tx_id: 1, status: TransactionStatus::Completed });
+    updates.push_back(TransactionStatusUpdate { tx_id: 999, status: TransactionStatus::Failed });
+
+    let result = client.update_transaction_statuses(&admin, &updates);
+
+    assert_eq!(result.total_requests, 2);
+    assert_eq!(result.successful, 1);
+    assert_eq!(result.failed, 1);
+
+    let stored_status = client.get_transaction_status(&1);
+    assert_eq!(stored_status, Some(TransactionStatus::Completed));
+}
+
+#[test]
+#[should_panic]
+fn test_update_transaction_statuses_unauthorized() {
+    let (env, _admin, client) = setup_test_env();
+
+    let unauthorized = Address::generate(&env);
+    let updates: Vec<TransactionStatusUpdate> = Vec::new(&env);
+
+    client.update_transaction_statuses(&unauthorized, &updates);
+}
+
+#[test]
+fn test_update_transaction_statuses_multiple_batches() {
+    let (env, admin, client) = setup_test_env();
+
+    let mut transactions: Vec<Transaction> = Vec::new(&env);
+    transactions.push_back(create_transaction(&env, 1, 1000, "transfer"));
+
+    client.process_batch(&admin, &transactions, &None);
+
+    let mut updates1: Vec<TransactionStatusUpdate> = Vec::new(&env);
+    updates1.push_back(TransactionStatusUpdate { tx_id: 1, status: TransactionStatus::Pending });
+    client.update_transaction_statuses(&admin, &updates1);
+
+    let mut updates2: Vec<TransactionStatusUpdate> = Vec::new(&env);
+    updates2.push_back(TransactionStatusUpdate { tx_id: 1, status: TransactionStatus::Completed });
+    let result2 = client.update_transaction_statuses(&admin, &updates2);
+
+    assert_eq!(result2.total_requests, 1);
+    assert_eq!(result2.successful, 1);
+
+    let stored_status = client.get_transaction_status(&1);
+    assert_eq!(stored_status, Some(TransactionStatus::Completed));
+}
+
 // ============================================================================
 // Category Metrics Tests
 // ============================================================================
@@ -465,6 +524,7 @@ fn test_batch_audit_log_success() {
     let log2 = client.get_audit_log(&2).unwrap();
     assert_eq!(log2.actor, actor);
     assert_eq!(log2.operation, Symbol::new(&env, "update_profile"));
+}
 // Transaction Bundling Tests
 // ============================================================================
 
@@ -579,7 +639,7 @@ fn test_bundle_transactions_with_negative_amount() {
     let mut bundled_txs: Vec<BundledTransaction> = Vec::new(&env);
     bundled_txs.push_back(create_bundled_transaction(&env, 1, 1000, "transfer"));
     // Create a transaction with negative amount (should fail validation)
-    let mut invalid_tx = create_bundled_transaction(&env, 2, -100, "budget");
+    let invalid_tx = create_bundled_transaction(&env, 2, -100, "budget");
     bundled_txs.push_back(invalid_tx);
     bundled_txs.push_back(create_bundled_transaction(&env, 3, 3000, "savings"));
 
@@ -689,7 +749,10 @@ fn test_audit_log_events_emitted() {
     let events = env.events().all();
     // At least one audit log event should be emitted
     assert!(events.len() >= 1);
-=======
+}
+
+#[test]
+#[should_panic]
 fn test_bundle_empty_transactions() {
     let (env, admin, client) = setup_test_env();
 
